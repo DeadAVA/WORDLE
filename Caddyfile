@@ -1,0 +1,22 @@
+wordlegame.dpdns.org {
+    # Proxy to the nginx container serving the built app
+    reverse_proxy wordle-app:80
+
+    # Compression (Caddy handles this before nginx)
+    encode zstd gzip
+
+    # Security headers
+    header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-XSS-Protection "1; mode=block"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    log {
+        output stdout
+        level INFO
+    }
+}

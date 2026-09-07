@@ -1,0 +1,43 @@
+services:
+  wordle-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wordle-app:latest
+    container_name: wordle-app
+    ports:
+      - "5002:80"
+    restart: unless-stopped
+    networks:
+      - wordle-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: wordle-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - wordle-net
+    depends_on:
+      - wordle-app
+    restart: unless-stopped
+
+networks:
+  wordle-net:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
