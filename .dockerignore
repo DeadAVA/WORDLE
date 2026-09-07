@@ -6,3 +6,4 @@ dist
 .env*
 Caddyfile
 docker-compose.yml
+deploy.sh
