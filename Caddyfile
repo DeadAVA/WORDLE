@@ -1,11 +1,16 @@
 wordlegame.dpdns.org {
-    # Proxy to the nginx container serving the built app
-    reverse_proxy wordle-app:80
+    # PeerJS signaling server (WebSocket + REST)
+    handle /peerjs/* {
+        reverse_proxy peerjs:9000
+    }
 
-    # Compression (Caddy handles this before nginx)
+    # Main app
+    handle {
+        reverse_proxy wordle-app:80
+    }
+
     encode zstd gzip
 
-    # Security headers
     header {
         X-Frame-Options "SAMEORIGIN"
         X-Content-Type-Options "nosniff"

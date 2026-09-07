@@ -24,6 +24,15 @@ export interface UseDuelReturn {
   closeDuel: () => void;
 }
 
+function peerConfig() {
+  const { hostname, protocol } = window.location;
+  if (protocol === 'https:') {
+    return { host: hostname, port: 443, path: '/peerjs', secure: true, debug: 0 };
+  }
+  // local dev: PeerJS server exposed directly on port 9000
+  return { host: hostname, port: 9000, path: '/peerjs', secure: false, debug: 0 };
+}
+
 export function useDuel(): UseDuelReturn {
   const [duel, setDuel] = useState<DuelState>(initDuel);
   const connRef = useRef<unknown>(null);
@@ -83,7 +92,7 @@ export function useDuel(): UseDuelReturn {
   ): Promise<string> => {
     const { Peer } = await import('peerjs');
     const code = generateRoomCode();
-    const peer = new Peer(code, { debug: 0 });
+    const peer = new Peer(code, peerConfig());
 
     setDuel(prev => ({ ...prev, active: true, isHost: true, peer, roomCode: code, status: 'waiting' }));
 
@@ -114,7 +123,7 @@ export function useDuel(): UseDuelReturn {
     onToast: (msg: string) => void,
   ): Promise<void> => {
     const { Peer } = await import('peerjs');
-    const peer = new Peer({ debug: 0 });
+    const peer = new Peer(peerConfig());
 
     setDuel(prev => ({ ...prev, active: true, isHost: false, peer, roomCode: code, status: 'connecting' }));
 

@@ -17,6 +17,16 @@ services:
       retries: 3
       start_period: 10s
 
+  peerjs:
+    image: peerjs/peerjs-server:latest
+    container_name: wordle-peerjs
+    command: ["--port", "9000", "--path", "/peerjs"]
+    ports:
+      - "9000:9000"     # local dev access
+    networks:
+      - wordle-net
+    restart: unless-stopped
+
   caddy:
     image: caddy:2-alpine
     container_name: wordle-caddy
@@ -32,6 +42,7 @@ services:
       - wordle-net
     depends_on:
       - wordle-app
+      - peerjs
     restart: unless-stopped
 
 networks:
